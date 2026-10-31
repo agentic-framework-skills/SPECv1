@@ -50,6 +50,12 @@ WHAT <product concept>
 
 INIT
     # Triggers autonomous authoring of all 11 folders in RFC 2119 language
+
+AUDIT [integrity|reliability|consistency|drift]
+    # Audits existing specs: integrity (folders + schema + RFC 2119),
+    # reliability (requirements testable/mapped), consistency (no
+    # cross-folder contradictions), implementation drift (specs vs source).
+    # Defaults to all four dimensions if omitted. Emits AUDIT-REPORT.md.
 ```
 
 ---

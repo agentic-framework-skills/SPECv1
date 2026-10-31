@@ -79,6 +79,20 @@ When received:
 2. Cease all user prompting and questions.
 3. Automatically author all specification folders (01 through 11) sequentially and autonomously.
 
+### Command: `AUDIT <scope?>`
+When received:
+1. **Trigger**: Can be issued any time after `INIT` has authored the specification folders, or against an existing specs repository.
+2. **Scope** (optional): One or more of `integrity`, `reliability`, `consistency`, `drift`. Defaults to all four if omitted.
+3. **Zero Interactivity**: Once `AUDIT` is received, all questioning ceases. The engine audits autonomously and emits a structured audit report.
+4. **Audit dimensions**:
+
+   * **Integrity** — Every folder (01 through 11) MUST exist. Each folder MUST contain at least one markdown file with the minimum schema (`# <Folder Title>`, `## Scope`, `## Normative Statements (RFC 2119)`, `## Open Questions`, `## Change Log`). Every normative statement MUST use capitalized RFC 2119 key words. Empty folders and missing schemas are integrity failures.
+   * **Reliability** — Every requirement (FR/NFR) MUST be uniquely identified and tagged with an RFC 2119 level. Every requirement MUST be testable/verifiable (no vague or unmeasurable statements). Every user story in `02-prd/` MUST map to at least one FR in `05-requirements/`.
+   * **Consistency** — No contradictions across folders: `02-prd/` goals MUST align with `03-architecture/` components; `04-adrs/` decisions MUST not contradict `03-architecture/` topology; `05-requirements/` MUST match `06-schemas/` field definitions; `07-sdlc/` approval gates MUST match `08-code-conventions/` review standards.
+   * **Implementation Drift** — If a source repository path is provided (via `WHAT` context or `--source` flag), the engine MUST compare declared specs against actual code: components in `03-architecture/` MUST exist in source; schemas in `06-schemas/` MUST match database/API definitions; code conventions in `08-code-conventions/` MUST be enforced in CI. Any mismatch is logged as a drift item with severity (Breach / Warning / Advisory).
+
+5. **Output**: An `AUDIT-REPORT.md` file listing each dimension, PASS/FAIL status, findings, and remediation actions. If implementation drift is detected, the report MUST include a drift backlog mapped to `11-implementation-plan/` milestones.
+
 ---
 
 ## 4. SPECIFICATION FOLDER STRUCTURE
@@ -207,5 +221,6 @@ Each folder MUST produce a primary markdown file with this minimum structure:
 3. **Post-INIT Phase**: Zero interactivity. No user prompts. Complete all folders autonomously.
 4. **No Assumptions**: Never assume a specific language, framework, cloud provider, or team structure unless declared in `WHAT`.
 5. **Org Verification**: Before `INIT`, if the product belongs to an org, confirm org structure context is captured. If standalone, record single-owner model.
+6. **AUDIT Phase**: After `INIT`, the `AUDIT` command MAY be issued any time to verify integrity, reliability, consistency, and implementation drift. AUDIT produces an `AUDIT-REPORT.md` and MUST NOT modify specification folders directly; remediation actions are logged to `11-implementation-plan/`.
 
-System Ready. Awaiting user command: `WHAT <sentence>` or `INIT`.
+System Ready. Awaiting user command: `WHAT <sentence>`, `INIT`, or `AUDIT`.
